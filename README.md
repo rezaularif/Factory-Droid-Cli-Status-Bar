@@ -1,14 +1,56 @@
-# Droid Status Bar
-
-A tiny macOS menu bar app that shows **Droid** (Factory CLI) live status: animated icon while thinking/running tools, yellow dot for permission prompts, optional elapsed timer.
+<div align="center">
+  <img src="assets/AppIcon.png" width="128" alt="Droid Status Bar icon" />
+  <h1>Droid Status Bar</h1>
+  <p><strong>See what Droid is doing without opening a terminal.</strong><br />A calm, glanceable status indicator for Factory and Droid CLI on macOS.</p>
+  <p>
+    <a href="https://github.com/rezaularif/Factory-Droid-Cli-Status-Bar/releases/latest"><img src="assets/download.png" width="230" alt="Download for macOS" /></a>
+  </p>
+  <p>
+    <img src="https://img.shields.io/github/v/release/rezaularif/Factory-Droid-Cli-Status-Bar?label=latest%20release&color=ef6f2e" alt="Latest release" />
+    <img src="https://img.shields.io/badge/macOS-12%2B-111111?logo=apple&logoColor=white" alt="macOS 12 or later" />
+    <img src="https://img.shields.io/github/license/rezaularif/Factory-Droid-Cli-Status-Bar?color=111111" alt="MIT license" />
+  </p>
+</div>
 
 ## See it in action
 
-![Droid Status Bar cycling built-in animations in the macOS menu bar](assets/droid-status-bar-demo.gif)
+<p align="center">
+  <img src="assets/droid-status-bar-demo.gif" alt="Droid Status Bar cycling built-in animations in the macOS menu bar" />
+</p>
 
 The recording cycles through the built-in animation styles one by one while retaining the real right-side menu-bar layout, including the system icons and date/time.
 
-## Layout
+## At a glance
+
+| You see | What it means |
+| --- | --- |
+| 🟠 Animated icon | Droid is actively thinking or using a tool |
+| 📝 Live activity | The current action, such as reading a file or running tests |
+| ⏱ Elapsed time | How long the current task has been running |
+| 🟡 Permission prompt | Droid is waiting for you to approve something |
+| 👥 One calm task row | Factory workers are grouped under their main task |
+
+## How it works
+
+```mermaid
+flowchart LR
+    A["You ask Factory to do something"] --> B["Droid works in the background"]
+    B --> C["Droid Status Bar watches the session"]
+    C --> D["You see progress, tools, time, and permissions"]
+```
+
+Nothing new to learn: keep working in Factory as usual, and glance at the menu bar whenever you want reassurance that the task is moving.
+
+## Install in about 30 seconds
+
+1. Click the **Download for macOS** button above, or download `DroidStatusBar.dmg` from the [latest release](https://github.com/rezaularif/Factory-Droid-Cli-Status-Bar/releases/latest).
+2. Open the download and drag **Droid Status Bar** into your **Applications** folder.
+3. Open the app once. It installs the Factory connection automatically.
+
+On first launch, macOS may show an unidentified-developer warning because public notarization is not configured yet. Control-click the app, choose **Open**, and confirm once.
+
+<details>
+<summary>Technical architecture</summary>
 
 ```
 hooks/
@@ -28,20 +70,6 @@ Sources/
   *Frames.swift         animation assets (unchanged)
 ```
 
-## How it works
-
-1. Droid fires hooks → Node scripts write `~/.factory/statusbar/state.d/<session>.json`
-2. The app polls that directory and shows the highest-priority session
-3. SessionStart launches the app; it quits when no sessions remain (and Factory is closed)
-
-## Install
-
-### Download the latest release
-
-Download `DroidStatusBar.dmg` from the [latest GitHub release](https://github.com/rezaularif/Factory-Droid-Cli-Status-Bar/releases/latest), open it, and drag **Droid Status Bar** into `/Applications`.
-
-On first launch, macOS may show an unidentified-developer warning because public notarization is not configured yet. In that case, Control-click the app in `/Applications`, choose **Open**, and confirm once. The app then installs the Factory hooks automatically.
-
 ### Build from source
 
 ```bash
@@ -56,6 +84,8 @@ Or hooks only:
 ```bash
 node hooks/install.js
 ```
+
+</details>
 
 ## Debug
 
