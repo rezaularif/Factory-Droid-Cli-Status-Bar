@@ -30,6 +30,14 @@ Sources/
 
 ## Install
 
+### Download the latest release
+
+Download `DroidStatusBar.dmg` from the [latest GitHub release](https://github.com/rezaularif/Factory-Droid-Cli-Status-Bar/releases/latest), open it, and drag **Droid Status Bar** into `/Applications`.
+
+On first launch, macOS may show an unidentified-developer warning because public notarization is not configured yet. In that case, Control-click the app in `/Applications`, choose **Open**, and confirm once. The app then installs the Factory hooks automatically.
+
+### Build from source
+
 ```bash
 cd ~/droid-status-bar
 ./build.sh

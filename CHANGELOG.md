@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.2.6
+
+- Added live parallel-tool activity tracking with automatic cycling in the menu bar.
+- Improved status text, session freshness, permission labels, and activity details.
+- Collapsed Factory parent sessions and delegated Explorer workers into one top-level session row.
+- Fixed lifecycle handling for null/empty state and stale session records.
+
 ## 0.2.4
 
 - Default **three-dot** loader (#ef6f2e); menu-bar text hard-capped
