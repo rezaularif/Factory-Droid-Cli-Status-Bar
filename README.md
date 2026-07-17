@@ -2,6 +2,10 @@
 
 A tiny macOS menu bar app that shows **Droid** (Factory CLI) live status: animated icon while thinking/running tools, yellow dot for permission prompts, optional elapsed timer.
 
+## See it in action
+
+![Droid Status Bar cycling live parallel activities](assets/droid-status-bar-demo.gif)
+
 ## Layout
 
 ```
