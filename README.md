@@ -4,7 +4,9 @@ A tiny macOS menu bar app that shows **Droid** (Factory CLI) live status: animat
 
 ## See it in action
 
-![Droid Status Bar cycling live parallel activities](assets/droid-status-bar-demo.gif)
+![Droid Status Bar cycling built-in animations in the macOS menu bar](assets/droid-status-bar-demo.gif)
+
+The recording cycles through the built-in animation styles one by one while retaining the real right-side menu-bar layout, including the system icons and date/time.
 
 ## Layout
 
