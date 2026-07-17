@@ -1,5 +1,5 @@
 <div align="center">
-  <img src="assets/AppIcon.png" width="128" alt="Droid Status Bar icon" />
+  <img src="assets/AppIcon.png" width="128" alt="Droid orange three-dot loader icon" />
   <h1>Droid Status Bar</h1>
   <p><strong>See what Droid is doing without opening a terminal.</strong><br />A calm, glanceable status indicator for Factory and Droid CLI on macOS.</p>
   <p>
@@ -11,6 +11,8 @@
     <img src="https://img.shields.io/github/license/rezaularif/Factory-Droid-Cli-Status-Bar?color=111111" alt="MIT license" />
   </p>
 </div>
+
+The app icon uses the same Droid orange three-dot loader as the default menu-bar animation.
 
 ## See it in action
 

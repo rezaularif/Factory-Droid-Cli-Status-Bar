@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.2.7
+
+- Replaced the old Claude-derived app icon with a Droid orange three-dot loader icon.
+- Updated the README hero graphic to use the new Droid visual identity.
+
 ## 0.2.6
 
 - Added live parallel-tool activity tracking with automatic cycling in the menu bar.

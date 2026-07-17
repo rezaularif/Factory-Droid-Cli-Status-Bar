@@ -5,7 +5,7 @@ cd "$(dirname "$0")"
 
 APP="build/DroidStatusBar.app"
 BIN="$APP/Contents/MacOS/DroidStatusBar"
-VERSION="0.2.6"
+VERSION="0.2.7"
 
 rm -rf "$APP"
 mkdir -p "$APP/Contents/MacOS"
