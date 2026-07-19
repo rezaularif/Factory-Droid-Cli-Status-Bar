@@ -6,6 +6,7 @@ cd "$(dirname "$0")"
 APP="build/DroidStatusBar.app"
 BIN="$APP/Contents/MacOS/DroidStatusBar"
 VERSION="0.2.7"
+SIGNING_IDENTITY="Developer ID Application: Rezaul Arif (983ZL434M5)"
 
 rm -rf "$APP"
 mkdir -p "$APP/Contents/MacOS"
@@ -43,7 +44,8 @@ cp assets/AppIcon.icns "$APP/Contents/Resources/AppIcon.icns"
 cp assets/droid-logo-frames.json assets/droid-spinners.json "$APP/Contents/Resources/" 2>/dev/null || true
 
 xattr -cr "$APP"
-codesign --force --sign - "$APP" >/dev/null 2>&1 || true
+codesign --force --deep --options runtime --timestamp --sign "$SIGNING_IDENTITY" "$APP"
+codesign --verify --deep --strict --verbose=2 "$APP"
 echo "Built $APP (v${VERSION})"
 
 if [[ "${1:-}" == "--dmg" ]]; then
