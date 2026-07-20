@@ -1,5 +1,32 @@
 # Changelog
 
+## 0.4.1
+
+- Added the selected animated Droid indicator to a compact right-side notch ear while work is active.
+- Faded the indicator seamlessly into the expanded task view on hover.
+- Kept the physical camera-housing position unchanged so the cue reads as part of the notch.
+
+## 0.4.0
+
+- Redesigned the expanded notch as a structured two-line live activity with task title, current action, and optional elapsed time.
+- Added brief automatic peeks for new tasks and longer amber approval alerts.
+- Added a short hover-exit grace period to prevent edge flicker.
+- Kept long activity details readable with an overflow-only marquee while task titles remain stable.
+
+## 0.3.1
+
+- Matched the resting overlay exactly to the detected camera-housing width and depth.
+- Added a compact hover expansion with smooth, looping marquee text for long tasks.
+- Replaced the notch spinner with a calmer activity pulse in the expanded view.
+- Made left-click open the active Factory or terminal task; right-click opens options.
+
+## 0.3.0
+
+- Added a notch-native activity surface that grows from the MacBook camera housing.
+- Moved live activity, animations, timers, and permission feedback out of the menu bar on notched Macs.
+- Kept the sessions and options menu accessible by clicking the notch surface.
+- Added automatic menu-bar fallback for Macs and displays without a usable notch.
+
 ## 0.2.7
 
 - Replaced the old Claude-derived app icon with a Droid orange three-dot loader icon.

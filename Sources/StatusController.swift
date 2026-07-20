@@ -3,6 +3,7 @@ import Cocoa
 final class StatusController: NSObject, NSMenuDelegate {
     let statusItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.variableLength)
     let store = SessionStore()
+    private lazy var notchOverlay = NotchOverlayController()
 
     private var pollTimer: Timer?
     private var animTimer: Timer?
@@ -13,6 +14,13 @@ final class StatusController: NSObject, NSMenuDelegate {
     private var menuIsOpen = false
     private var sessionMenuItems: [(item: NSMenuItem, id: String)] = []
     private var activeBase = ""
+    private var activeNotchSessionID = ""
+    private var activeNotchTitle = ""
+    private var activeNotchDetail = ""
+    private var activeToolTip: String?
+    private var activeLead: Session?
+    private var activeAnimating = false
+    private var activeAttention = false
     private var startedAt: Double = 0
     private var activeColor: NSColor?
     private var activityIndex = 0
@@ -127,17 +135,36 @@ final class StatusController: NSObject, NSMenuDelegate {
             animStyle = st.resolved
         }
 
-        // Ensure the status item is visible and has a clickable button.
-        statusItem.isVisible = true
+        // Notched Macs use the camera-housing overlay as their primary surface.
+        // Other Macs keep the existing menu-bar item as a full fallback.
+        statusItem.isVisible = !notchOverlay.isAvailable
         if let button = statusItem.button {
             button.imagePosition = .imageOnly
-            button.toolTip = "Droid Status Bar"
+            button.toolTip = "Droid activity"
         }
 
         let menu = NSMenu()
         menu.autoenablesItems = true
         menu.delegate = self
         statusItem.menu = menu
+        notchOverlay.onClick = { [weak self] in
+            guard let self else { return }
+            if let lead = self.activeLead,
+               lead.entrypoint == "factory-desktop" || !lead.termProgram.isEmpty {
+                self.openSession(lead.id, entrypoint: lead.entrypoint, termProgram: lead.termProgram)
+            } else if let menu = self.statusItem.menu {
+                self.notchOverlay.popUp(menu)
+            }
+        }
+        notchOverlay.onRightClick = { [weak self] in
+            guard let self, let menu = self.statusItem.menu else { return }
+            self.notchOverlay.popUp(menu)
+        }
+        notchOverlay.onAvailabilityChange = { [weak self] available in
+            guard let self else { return }
+            self.statusItem.isVisible = !available && self.needsToStayAlive()
+            self.tick()
+        }
         render(label: "", color: iconColor, animate: false, startedAt: 0)
 
         let t = Timer(timeInterval: 0.4, repeats: true) { [weak self] _ in self?.tick() }
@@ -219,13 +246,33 @@ final class StatusController: NSObject, NSMenuDelegate {
     }
 
     private func applyLead(_ lead: Session?) {
-        statusItem.button?.toolTip = lead.map(tooltip(for:))
+        activeLead = lead
+        let tip = lead.map(tooltip(for:))
+        statusItem.button?.toolTip = tip
         guard let lead = lead else { renderResting(); return }
         switch lead.eff {
         case SessionState.permission:
-            render(label: permissionText(lead), color: Brand.amber, animate: false, startedAt: 0, dot: true)
+            render(
+                label: permissionText(lead),
+                notchSessionID: lead.id,
+                notchTitle: store.sessionName(lead),
+                notchDetail: notchPermissionText(lead),
+                toolTip: tip,
+                color: Brand.amber,
+                animate: false,
+                attention: true,
+                startedAt: 0,
+                dot: true)
         case SessionState.thinking, SessionState.tool:
-            render(label: statusText(lead), color: iconColor, animate: true, startedAt: lead.startedAt)
+            render(
+                label: statusText(lead),
+                notchSessionID: lead.id,
+                notchTitle: store.sessionName(lead),
+                notchDetail: notchActivityText(lead),
+                toolTip: tip,
+                color: iconColor,
+                animate: true,
+                startedAt: lead.startedAt)
         default:
             renderResting()
         }
@@ -298,6 +345,18 @@ final class StatusController: NSObject, NSMenuDelegate {
         return detail.isEmpty ? "Approve" : "Approve · " + detail
     }
 
+    /// Hover detail uses a marquee, so preserve the complete live operation
+    /// instead of applying the menu bar's 18-character cap.
+    private func notchActivityText(_ s: Session) -> String {
+        let activity = displayedActivity(s)
+        return activity.isEmpty ? stateLabel(s.eff) : activity
+    }
+
+    private func notchPermissionText(_ s: Session) -> String {
+        let detail = displayedActivity(s)
+        return detail.isEmpty ? "Approval needed" : "Approval needed · " + detail
+    }
+
     // MARK: - Lifecycle
 
     func factoryDesktopRunning() -> Bool {
@@ -330,12 +389,12 @@ final class StatusController: NSObject, NSMenuDelegate {
         if now.timeIntervalSince(launchedAt) < grace { return }
         if needsToStayAlive() {
             notNeededSince = nil
-            // Ensure the item is visible while working.
-            statusItem.isVisible = true
+            statusItem.isVisible = !notchOverlay.isAvailable
             return
         }
-        // Nothing active — hide immediately, then quit after a brief debounce.
+        // Nothing active — retract either surface, then quit after a brief debounce.
         statusItem.isVisible = false
+        notchOverlay.hide()
         if let since = notNeededSince {
             if now.timeIntervalSince(since) >= Timeouts.idleQuit { NSApp.terminate(nil) }
         } else {
@@ -648,12 +707,31 @@ final class StatusController: NSObject, NSMenuDelegate {
 
     // MARK: - Render
 
-    private func renderResting() { render(label: "", color: iconColor, animate: false, startedAt: 0) }
+    private func renderResting() {
+        render(label: "", toolTip: nil, color: iconColor, animate: false, startedAt: 0)
+    }
 
-    private func render(label: String, color: NSColor?, animate: Bool, startedAt: Double, dot: Bool = false) {
+    private func render(
+        label: String,
+        notchSessionID: String = "",
+        notchTitle: String = "",
+        notchDetail: String = "",
+        toolTip: String? = nil,
+        color: NSColor?,
+        animate: Bool,
+        attention: Bool = false,
+        startedAt: Double,
+        dot: Bool = false
+    ) {
         guard let button = statusItem.button else { return }
         button.contentTintColor = nil
         activeBase = label
+        activeNotchSessionID = notchSessionID
+        activeNotchTitle = notchTitle
+        activeNotchDetail = notchDetail
+        activeToolTip = toolTip
+        activeAnimating = animate
+        activeAttention = attention
         activeColor = color
         self.startedAt = startedAt
 
@@ -698,6 +776,7 @@ final class StatusController: NSObject, NSMenuDelegate {
         if text.isEmpty {
             button.imagePosition = .imageOnly
             button.attributedTitle = NSAttributedString(string: "")
+            notchOverlay.hide()
             return
         }
         button.imagePosition = .imageLeading
@@ -706,6 +785,24 @@ final class StatusController: NSObject, NSMenuDelegate {
             .font: NSFont.monospacedDigitSystemFont(ofSize: 0, weight: .regular),
         ]
         button.attributedTitle = NSAttributedString(string: " \(text)", attributes: attrs)
+
+        let notchElapsed = showTimer && startedAt > 0
+            ? elapsed(max(0, Int(Date().timeIntervalSince1970 - startedAt)))
+            : nil
+        if notchOverlay.isAvailable {
+            notchOverlay.show(
+                sessionID: activeNotchSessionID,
+                title: activeNotchTitle,
+                detail: activeNotchDetail,
+                elapsed: notchElapsed,
+                indicator: button.image,
+                toolTip: activeToolTip,
+                color: activeColor ?? .white,
+                pulses: activeAnimating,
+                attention: activeAttention)
+        } else {
+            notchOverlay.hide(animated: false)
+        }
     }
 
     // MARK: - Icons

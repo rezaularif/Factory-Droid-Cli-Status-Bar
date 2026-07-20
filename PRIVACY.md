@@ -1,6 +1,6 @@
 # Privacy
 
-Droid Status Bar is fully local:
+Droid Notch is fully local:
 
 - Hook scripts write session state only under `~/.factory/statusbar/`.
 - The menu bar app reads that directory and never uploads status data.

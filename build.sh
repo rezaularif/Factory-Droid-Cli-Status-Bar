@@ -5,7 +5,7 @@ cd "$(dirname "$0")"
 
 APP="build/DroidStatusBar.app"
 BIN="$APP/Contents/MacOS/DroidStatusBar"
-VERSION="0.2.7"
+VERSION="0.4.1"
 SIGNING_IDENTITY="Developer ID Application: Rezaul Arif (983ZL434M5)"
 
 rm -rf "$APP"
@@ -23,7 +23,7 @@ cat > "$APP/Contents/Info.plist" <<PLIST
 <plist version="1.0">
 <dict>
   <key>CFBundleName</key><string>DroidStatusBar</string>
-  <key>CFBundleDisplayName</key><string>Droid Status Bar</string>
+  <key>CFBundleDisplayName</key><string>Droid Notch</string>
   <key>CFBundleIdentifier</key><string>com.local.droidstatusbar</string>
   <key>CFBundleExecutable</key><string>DroidStatusBar</string>
   <key>CFBundleVersion</key><string>${VERSION}</string>
@@ -56,7 +56,7 @@ if [[ "${1:-}" == "--dmg" ]]; then
   mkdir -p "$STAGE"
   cp -R "$APP" "$STAGE/"
   ln -s /Applications "$STAGE/Applications"
-  hdiutil create -volname "Droid Status Bar" -srcfolder "$STAGE" -ov -format UDZO "$DMG" >/dev/null
+  hdiutil create -volname "Droid Notch" -srcfolder "$STAGE" -ov -format UDZO "$DMG" >/dev/null
   rm -rf "$STAGE"
   echo "Built $DMG"
 fi
